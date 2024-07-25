@@ -3,10 +3,13 @@ pipeline {
 
     parameters {
         string(name: 'DOCKER_IMAGE_NAME', description: 'Enter the Docker image name', defaultValue: 'shivanandareddy452/custom-img-12-06-2024')
+        string(name: 'GIT_REPO_URL', description: 'URL of the Git repository to clone', defaultValue: 'https://github.com/awscloudrockers/jenkins-cicd-docker.git')
+        string(name: 'DOCKERHUB_USERNAME', description: 'DockerHub username for login', defaultValue: 'shivanandareddy452')
+        string(credentialsId: 'dockerhub_id', name: 'DOCKERHUB_CREDENTIALS', description: 'Credentials for DockerHub login')
     }
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub_id')
+        DOCKERHUB_CREDENTIALS_PSW = credentials('dockerhub_id')
     }
 
     stages {
@@ -21,11 +24,8 @@ pipeline {
         stage('Force Cleanup') {
             steps {
                 script {
-                    // Stop and remove all running containers
                     sh 'sudo docker stop $(sudo docker ps -a -q) || true'
                     sh 'sudo docker rm $(sudo docker ps -a -q) || true'
-
-                    // Remove all Docker images
                     sh 'sudo docker rmi $(sudo docker images -q) || true'
                 }
             }
@@ -64,7 +64,7 @@ pipeline {
                 script {
                     sh 'sudo yum install -y git'
                     sh 'rm -rf /tmp/jenkins-cicd-docker'
-                    sh 'git clone https://github.com/awscloudrockers/jenkins-cicd-docker.git /tmp/jenkins-cicd-docker'
+                    sh "git clone ${params.GIT_REPO_URL} /tmp/jenkins-cicd-docker"
                     sh 'ls /tmp/jenkins-cicd-docker'
                 }
             }
@@ -106,7 +106,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'dockerhub_id', variable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-                        sh "echo \${DOCKERHUB_CREDENTIALS_PSW} | sudo docker login -u shivanandareddy452 --password-stdin"
+                        sh "echo \${DOCKERHUB_CREDENTIALS_PSW} | sudo docker login -u ${params.DOCKERHUB_USERNAME} --password-stdin"
                     }
                 }
             }
