@@ -5,7 +5,7 @@ pipeline {
         string(name: 'DOCKER_IMAGE_NAME', description: 'Enter the Docker image name')
         string(name: 'GIT_REPO_URL', description: 'URL of the Git repository to clone')
         string(name: 'DOCKERHUB_USERNAME', description: 'DockerHub username for login')
-        credentials(name: 'DOCKERHUB_CREDENTIALS', description: 'Credentials for DockerHub login', defaultValue: '', required: true)
+        credentials(name: 'DOCKERHUB_CREDENTIALS', description: 'Credentials for DockerHub login', defaultValue: '', required: true, type: 'String')
     }
 
     environment {
