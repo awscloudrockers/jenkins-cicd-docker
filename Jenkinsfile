@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'DOCKER_IMAGE_NAME', description: 'Enter the Docker image name', defaultValue: 'shivanandareddy452/custom-img-12-06-2024')
+        string(name: 'DOCKER_IMAGE_NAME', description: 'Enter the Docker image name', defaultValue: 'shivanandareddy452/custom-img-25-07-2024')
         string(name: 'GIT_REPO_URL', description: 'URL of the Git repository to clone', defaultValue: 'https://github.com/awscloudrockers/jenkins-cicd-docker.git')
         string(name: 'DOCKERHUB_USERNAME', description: 'DockerHub username for login', defaultValue: 'shivanandareddy452')
         string(credentialsId: 'dockerhub_id', name: 'DOCKERHUB_CREDENTIALS', description: 'Credentials for DockerHub login')
