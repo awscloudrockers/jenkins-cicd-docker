@@ -13,24 +13,35 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Clone Repository') {
             steps {
-                // Add your build steps here
-                echo 'Building the application...'
+                script {
+                    echo "Cloning repository from ${params.GIT_REPO_URL}..."
+                    sh "rm -rf /tmp/jenkins-cicd-docker"
+                    sh "git clone ${params.GIT_REPO_URL} /tmp/jenkins-cicd-docker"
+                }
             }
         }
 
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
-                // Add your test steps here
-                echo 'Running tests...'
+                script {
+                    echo "Building Docker image ${params.DOCKER_IMAGE_NAME}..."
+                    sh "sudo docker build -t ${params.DOCKER_IMAGE_NAME} /tmp/jenkins-cicd-docker"
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Push Docker Image to DockerHub') {
             steps {
-                // Add your deployment steps here
-                echo 'Deploying to production...'
+                script {
+                    echo "Pushing Docker image ${params.DOCKER_IMAGE_NAME} to DockerHub..."
+                    withCredentials([string(credentialsId: 'dockerhub_id', variable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+                        sh "echo \${DOCKERHUB_CREDENTIALS_PSW} | sudo docker login -u ${params.DOCKERHUB_USERNAME} --password-stdin"
+                        sh "sudo docker tag ${params.DOCKER_IMAGE_NAME} ${params.DOCKERHUB_USERNAME}/${params.DOCKER_IMAGE_NAME}"
+                        sh "sudo docker push ${params.DOCKERHUB_USERNAME}/${params.DOCKER_IMAGE_NAME}"
+                    }
+                }
             }
         }
     }
